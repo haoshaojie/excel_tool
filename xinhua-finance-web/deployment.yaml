@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cnfic-usermanage-ui
+  namespace: cnfic-usermanage
+spec:
+  selector:
+    app: cnfic-usermanage-ui
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cnfic-usermanage-ui
+  namespace: cnfic-usermanage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cnfic-usermanage-ui
+  template:
+    metadata:
+      labels:
+        app: cnfic-usermanage-ui
+    spec:
+      serviceAccount: config-reader
+      hostname: cnfic-usermanage-ui
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: cnfic-usermanage-ui
+          image: docker-public.tongtech.top/cnfic-usermanage/cnfic-usermanage-ui:v1.${CICD_EXECUTION_SEQUENCE}
+          ports:
+            - containerPort: 8000

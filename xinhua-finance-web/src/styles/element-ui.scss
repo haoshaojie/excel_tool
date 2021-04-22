@@ -1,0 +1,245 @@
+.el-dropdown-menu__item {
+    font-size: 12px !important;
+    line-height: 28px !important;
+}
+.el-card.is-always-shadow {
+    box-shadow: none;
+    border: none !important;
+}
+
+.el-scrollbar__view {
+    height: 100%;
+}
+
+.el-menu--horizontal {
+    border-bottom: none !important;
+}
+
+.el-menu {
+    border-right: none !important;
+}
+
+.el-menu--display,
+.el-menu--display+.el-submenu__icon-arrow {
+    display: none;
+}
+
+
+
+.el-message__icon,
+.el-message__content {
+    display: inline-block;
+}
+
+.el-date-editor .el-range-input,
+.el-date-editor .el-range-separator {
+    height: auto;
+    overflow: hidden;
+}
+
+.el-dialog__wrapper {
+    z-index: 2048;
+}
+
+// .el-scrollbar__wrap {
+//     overflow-x: hidden;
+// }
+
+.el-col {
+    margin-bottom: 8px;
+}
+
+.el-main {
+    padding: 0 !important;
+}
+.el-dropdown-menu__item--divided:before, .el-menu, .el-menu--horizontal>.el-menu-item:not(.is-disabled):focus, .el-menu--horizontal>.el-menu-item:not(.is-disabled):hover, .el-menu--horizontal>.el-submenu .el-submenu__title:hover {
+    background-color:transparent;
+}
+
+
+.el-dropdown-menu__item--divided:before, .el-menu, .el-menu--horizontal>.el-menu-item:not(.is-disabled):focus, .el-menu--horizontal>.el-menu-item:not(.is-disabled):hover, .el-menu--horizontal>.el-submenu .el-submenu__title:hover{
+    background-color: transparent !important;
+}
+
+.el-card__header {
+  padding: 6px 18px !important;
+}
+
+.el-card__body {
+  padding: 16px !important;
+}
+.el-checkbox__input.is-focus .el-checkbox__inner,.el-radio__input.is-focus .el-radio__inner{
+    border-color: #078ecf;
+}
+.el-button--default{
+    background: #ffffff;
+    border: 1px solid #078ecf;
+    color: #078ecf;
+}
+.el-button--default:hover{
+    background:#ddf0f9;
+    color: #078ecf;
+}
+.el-button--primary,
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-checkbox__input.is-indeterminate .el-checkbox__inner,
+.el-radio__input.is-checked .el-radio__inner{
+    background-color: #078ecf;
+    border-color: #078ecf;
+    color: #ffffff;
+}
+.el-button--primary:focus{
+    background-color: #078ecf;
+    border-color: #078ecf;
+    color: #ffffff;
+}
+.el-button--primary:hover{
+    opacity: 0.7;
+    background-color: #078ecf;
+    border-color: #078ecf;
+    color: #ffffff;
+}
+.el-button--dange{
+    background: #e02020;
+    border-color: #e02020;
+}
+.el-button--dange:hover{
+    opacity: 0.7;
+    background: #e02020;
+    border-color: #e02020;
+}
+.el-button--primary.is-plain{
+    color: #078ecf;
+    background: #ddf0f9;
+    border-color: #b6e1f5;
+}
+.el-button--primary.is-plain:hover{
+    opacity: 0.7;
+    background-color: #078ecf;
+    border-color: #078ecf;
+    color: #ffffff;
+}
+.el-button--small{
+    border-radius: 2px;
+    font-size: 14px;
+}
+.el-button--text{
+    color: #078ECF;
+}
+.el-button--text:hover{
+    color:#4cbbf3;
+}
+.el-tag{
+    background-color: #EDF5FF;
+    border-color: #078ECF;
+    color: #078ECF;
+}
+.el-pagination.is-background .el-pager li:not(.disabled).active{
+    background-color: #078ECF;
+}
+.el-radio{
+    color: #3e5265;
+}
+.el-radio__input.is-checked+.el-radio__label{
+    color: #078ecf;
+}
+.el-dialog{
+    border-radius: 5px;
+    .el-dialog__header{
+        background: #eceff5;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        padding: 18px 20px 14px;
+    }
+    .el-dialog__title{
+        font-size: 16px;
+        font-weight: 500;
+    }
+    .el-dialog__headerbtn{
+        top:15px;
+        font-size: 22px;
+    }
+}
+.el-button{
+    border-radius: 2px;
+}
+.el-tabs--border-card>.el-tabs__header{
+    background-color: #edf1f5;
+    border-bottom: 0;
+    .el-tabs__item{
+        border: 0;
+        color: #3e5265;
+    }
+    .el-tabs__item.is-active{
+        color: #ffffff;
+        box-shadow: 2px 0px 4px 0px rgba(0,0,0,0.04);
+        border: 0;
+    }
+}
+.el-tabs__item.is-active,.el-tabs__item:hover{
+    color: #078ecf;
+}
+.el-tabs__active-bar{
+    background-color: #078ecf;
+}
+.el-icon-arrow-down:before{
+    // content: "\e790";
+}
+.el-icon-arrow-up:before{
+    // content: "\e78f";
+}
+.el-select .el-input .el-select__caret{
+    color:#525E6F;
+}
+.el-form-item__label{
+ color:#3e5265;;
+}
+.el-step__icon.is-text{
+    border-width: 1px;
+}
+.el-step__icon-inner{
+    font-weight: 500;
+}
+.el-step__head.is-finish{
+    border-color: #078ecf;
+    color: #ffffff;
+    .el-step__icon.is-text{
+        color: #ffffff;
+        background:#078ecf;
+    }
+    .el-step__line{
+        background:#078ecf;
+    }
+}
+.el-step__title.is-finish,
+.el-step__description.is-finish,
+.el-link.el-link--primary{
+    color: #078ecf;
+}
+.el-step__head.is-process,.el-step__head.is-wait{
+    color: #9da7b0;
+    border-color:#9da7b0;
+}
+.el-step__title.is-process,.el-step__title.is-wait,.el-step__description.is-process{
+    color: #9da7b0;
+    font-weight: normal;
+}
+.avue--view{
+  .el-input.is-disabled .el-input__inner,
+  .el-textarea.is-disabled .el-textarea__inner{
+    background-color: #F5F7FA;
+    border:1px solid #E4E7ED;
+  }
+}
+.avue-form .el-date-editor.el-input__inner.is-disabled{
+  background-color: #F5F7FA;
+  border:1px solid #E4E7ED;
+}
+.avue--detail .el-range-editor.is-disabled input{
+  background-color: #F5F7FA;
+}
+.avue-crud{
+    .el-table__header thead tr th{
+        background-color: #f5f7fa;
+    }
+} 

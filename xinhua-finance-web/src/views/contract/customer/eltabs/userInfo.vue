@@ -1,0 +1,88 @@
+<!--用户信息--->
+<template>
+     <basic-container>
+         <div class="el-header">
+            <div>用户数量:<span>200</span></div>
+            <el-button type="text" >创建用户</el-button>
+        </div>
+        <avue-crud
+            :option="option"
+            :data="data"
+            :page="page"
+        ></avue-crud>
+     </basic-container>
+</template>
+<script>
+export default {
+    name:"user-info",
+    data(){
+        return{
+            page: {
+                pageSize: 10,
+                currentPage: 1,
+                total:1
+            },
+            option:{
+            addBtn:false,
+            editBtn:false,
+            delBtn:false,
+            refreshBtn:false,
+            columnBtn:false,
+            header:false,
+            border:true,
+            viewBtn:true,
+            viewBtnText:"查看详情",
+            column:[
+                {
+                label:'用户编号',
+                prop:'userCode'
+              },
+               {
+                label:'姓名',
+                prop:'name'
+              },
+              {
+                label:'性别',
+                prop:'sex'
+              },
+              {
+                label:'邮箱',
+                prop:'email'
+              },
+              {
+                label:'手机号码',
+                prop:'phone'
+              },
+              {
+                label:'用户类型',
+                prop:'userType'
+              },
+               {
+                label:'部门',
+                prop:'department'
+              },
+              {
+                label:'是否生成账号',
+                prop:'isAccount'
+              }
+            ]
+            },
+            data:[
+                {
+                userCode:"用户编码",
+                sex:"男",
+                name:"许管理",
+                email:"邮箱",
+                phone:"电话号码",
+                userType:"用户类型",
+                department:"部门",
+                isAccount:"部门"
+                }
+            ]
+        }
+    },
+    methods:{
+
+    }
+}
+</script>

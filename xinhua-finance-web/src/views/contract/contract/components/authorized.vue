@@ -1,0 +1,89 @@
+<!--已授权用户弹窗-->
+<template>
+    <basic-container>
+        <el-dialog 
+        title="已授权用户" 
+        :visible.sync="showAuthorized"
+         @close="closeDialog">
+            <avue-crud
+             ref="crud"
+             v-model="form"
+             :option="option"
+             :data="data">
+            </avue-crud>
+        </el-dialog>
+    </basic-container>
+</template>
+<script>
+export default {
+    name:"authorized-dialog",
+    props:{
+        showAuthorized:{
+            type:Boolean,
+            default:false
+        }
+    },
+    data(){
+        return{
+            form:{},
+            data:[],
+            option:{
+                calcHeight: 210,
+                searchMenuSpan:6,
+                tip: false,
+                border: true,
+                index: false,
+                viewBtn:false,
+                addBtn:false,
+                editBtn:false,
+                delBtn:false,
+                menu:false,
+                header:false,
+                selection: false,
+                column:[
+                     {
+                        label:"用户账号",
+                        prop:"productNo"
+                    },
+                     {
+                        label:"邮箱",
+                        prop:"productName"
+                    },
+                     {
+                        label:"手机号",
+                        prop:"startTime",
+                        type:"datetime",
+                    },
+                    {
+                        label:"姓名",
+                        prop:"endTime",
+                        type:"datetime",
+                    },
+                    {
+                        label:"部门",
+                        prop:"authorized",
+                        slot:true
+                    },
+                    {
+                        label:"用户状态",
+                        prop:"remaining"
+                    },
+                    {
+                        label:"授权时间",
+                        prop:"remaining"
+                    },
+                    {
+                        label:"授权人",
+                        prop:"remaining"
+                    }
+                ]
+            }
+        }
+    },
+    methods:{
+        closeDialog(){
+            this.$emit("close");
+        }
+    }
+}
+</script>

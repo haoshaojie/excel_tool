@@ -1,0 +1,149 @@
+<!---合同信息详情-->
+<template>
+    <div>
+        <div class="el-table-title">合同信息</div>
+        <table class="el-detail-table">
+            <tr>
+                <td>财务组织</td>
+                <td>2020122314210001</td>
+                <td>项目名称</td>
+                <td>中国工商银行2020专业终端服务合同</td>
+            </tr>
+            <tr>
+                <td>合同编码</td>
+                <td>企业合约</td>
+                <td>合同名称</td>
+                <td>试用合约</td>
+            </tr>
+            <tr>
+                <td>客户名称</td>
+                <td>启用</td>
+                <td>合同起始日期</td>
+                <td>新华财经</td>
+            </tr>
+            <tr>
+                <td>合同终止日期</td>
+                <td>KH202101299991</td>
+                <td>合同金额</td>
+                <td>中国工商银行</td>
+            </tr>
+            <tr>
+                <td>客户性质一</td>
+                <td>中经社</td>
+                <td>客户性质二</td>
+                <td>已续约</td>
+            </tr>
+            <tr>
+                <td>客户性质三</td>
+                <td>2021-01-01</td>
+                <td>签约主体</td>
+                <td>12</td>
+            </tr>
+            <tr>
+                <td>合同签约类型</td>
+                <td>2020-12-12</td>
+                <td>实际服务客户</td>
+                <td>2021-12-31</td>
+            </tr>
+            <tr>
+                <td>销售人员电话</td>
+                <td>10000000.00元</td>
+                <td>合同完结状态</td>
+                <td>1000000.00元</td>
+            </tr>
+            <tr>
+                <td>具体服务要求</td>
+                <td></td>
+                <td>签约日期</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>合同完结说明</td>
+                <td></td>
+                <td>确认收入方式</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>派工开始时间</td>
+                <td>是</td>
+                <td>派工结束时间</td>
+                <td>2020-12-14 12:00:00</td>
+            </tr>
+            <tr>
+                <td>生效日期</td>
+                <td>张萌</td>
+                <td>第三方机构性质</td>
+                <td>2020-12-14 12:00:00</td>
+            </tr>
+            <tr>
+                <td>第三方客户</td>
+                <td>温一飞</td>
+                <td>签约部门</td>
+                <td>2021-01-02 12:00:00</td>
+            </tr>
+            <tr>
+                <td>销售人员</td>
+                <td colspan="3">温一飞</td>
+            </tr>
+        </table>
+        <div class="el-table-title">产品信息</div>
+        <avue-crud
+         ref="productInfo"
+         :option="option"
+         :data="data"
+        ></avue-crud>
+    </div>
+</template>
+<script>
+export default {
+    name:"contract-info-detail",
+    data(){
+        return{
+            data:[],
+            option:{
+                calcHeight: 100,
+                searchShow: false,
+                searchMenuSpan: 6,
+                border: true,
+                index: false,
+                viewBtn: false,
+                addBtn:false,
+                refreshBtn:false,
+                columnBtn:false,
+                header:false,
+                menu:false,
+                column:[
+                    {
+                        label:"产品名称",
+                        prop:"productName"
+                    },
+                    {
+                        label:"产品部门",
+                        prop:"department"
+                    },
+                    {
+                        label:"产品平台",
+                        prop:"platform"
+                    },
+                    {
+                        label:"单价",
+                        prop:"price"
+                    },
+                    {
+                        label:"数量",
+                        prop:"count"
+                    },
+                    {
+                        label:"产品金额",
+                        prop:"amount"
+                    },
+                    {
+                        label:"产品组织",
+                        prop:"organization"
+                    }
+                ]
+            }
+        }
+    }
+}
+</script>
