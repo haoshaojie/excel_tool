@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.product.mapper.PropertyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="propertyResultMap" type="cn.com.cnfic.contractmanage.product.entity.Property">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="status" property="status"/>
+        <result column="prop_code" property="propCode"/>
+        <result column="prop_name" property="propName"/>
+        <result column="prop_type" property="propType"/>
+        <result column="prop_state" property="propState"/>
+        <result column="is_required" property="isRequired"/>
+        <result column="remark" property="remark"/>
+        <result column="show_type" property="showType"/>
+        <result column="table_name" property="tableName"/>
+    </resultMap>
+    <!-- 列表页面查询映射结果 -->
+    <resultMap id="propertyResultMapPage" type="cn.com.cnfic.contractmanage.product.vo.PropertyVO">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="status" property="status"/>
+        <result column="prop_code" property="propCode"/>
+        <result column="prop_name" property="propName"/>
+        <result column="prop_type" property="propType"/>
+        <result column="prop_state" property="propState"/>
+        <result column="is_required" property="isRequired"/>
+        <result column="remark" property="remark"/>
+        <result column="show_type" property="showType"/>
+        <result column="table_name" property="tableName"/>
+        <result column="category_count" property="categoryCount"/>
+        <result column="cate_prop_id" property="catePropId"/>
+    </resultMap>
+    <!-- 详情页面查询映射结果 -->
+    <resultMap id="propertyResultMapDetail" type="cn.com.cnfic.contractmanage.product.vo.PropertyVO">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="status" property="status"/>
+        <result column="prop_code" property="propCode"/>
+        <result column="prop_name" property="propName"/>
+        <result column="prop_type" property="propType"/>
+        <result column="prop_state" property="propState"/>
+        <result column="is_required" property="isRequired"/>
+        <result column="remark" property="remark"/>
+        <result column="show_type" property="showType"/>
+        <result column="table_name" property="tableName"/>
+        <result column="table_name" property="tableName"/>
+        <result column="category_count" property="categoryCount"/>
+        <collection property="propertyValue" ofType="cn.com.cnfic.contractmanage.product.vo.PropertyValueVO"
+                    column="id">
+            <!-- 这里的column对应的是下面查询的别名，而不是表字段名 -->
+            <id column="value_id" property="id"/>
+            <!-- property对应JavaBean中的属性名 -->
+            <result column="prop_value_code" property="propCode"/>
+            <result column="prop_value_value" property="propValue"/>
+        </collection>
+    </resultMap>
+    <!-- 列表页面查询 -->
+    <select id="selectPropertyPage" resultMap="propertyResultMapPage">
+        SELECT f.id,f.create_time,f.create_time,
+        f.create_user,f.update_time,f.update_user,
+        f.prop_code,f.prop_name,f.prop_type,f.is_required,f.remark,f.show_type,
+        category.category_count FROM pro_property f
+        LEFT JOIN ( SELECT s.prop_id,COUNT(s.id) AS category_count FROM pro_category_property s WHERE s.is_deleted = 0
+        GROUP BY s.prop_id) category ON category.prop_id = f.id
+        <where>
+            f.is_deleted = 0
+            <if test="property.propCode != null">
+                AND f.prop_code like CONCAT('%',#{property.propCode},'%' )
+            </if>
+            <if test="property.propName != null">
+                AND f.prop_name like CONCAT('%',#{property.propName},'%' )
+            </if>
+            <if test="property.propType != null">
+                AND f.prop_type = #{property.propType}
+            </if>
+        </where>
+        ORDER BY f.update_time DESC
+    </select>
+    <!-- 判断属性编码或者名称是否重复 -->
+    <select id="selectPropertyByCodeOrName" resultType="Integer">
+        SELECT count(*) FROM pro_property
+        <where>
+            is_deleted = 0
+            <if test="propCode != null">
+                AND ( prop_code = #{propCode}
+            </if>
+            <if test="propName != null">
+                OR prop_name = #{propName} )
+            </if>
+            <if test="id != null">
+                AND id &lt;&gt; #{id}
+            </if>
+        </where>
+    </select>
+    <!-- 查询详情，关联属性值表 -->
+    <select id="getDetailById" parameterType="java.lang.Long" resultMap="propertyResultMapDetail">
+        SELECT f.id,f.create_time,f.create_time,
+        f.create_user,f.update_time,f.update_user,
+        f.prop_code,f.prop_name,f.prop_type,f.is_required,f.remark,f.show_type, propValue.id AS value_id,propValue.prop_code AS prop_value_code,propValue.prop_value AS prop_value_value FROM pro_property f
+        LEFT JOIN pro_property_value propValue ON propValue.prop_id = f.id AND propValue.is_deleted = 0
+        WHERE f.id = #{id}
+    </select>
+    <!-- 产品类型列表页面查询,产品类型的所有属性 -->
+    <select id="selectPropertyPageInCategory" resultMap="propertyResultMapPage">
+        SELECT f.id,category.create_time,category.update_time,
+        category.create_user,category.update_user,
+        f.prop_code,f.prop_name,f.prop_type,f.is_required,f.remark,f.show_type,
+        cate_id,cate_prop_id FROM pro_property f
+        LEFT JOIN (
+        SELECT s.cate_id,s.id AS cate_prop_id,s.prop_id ,s.create_time,s.update_time,
+        s.create_user,s.update_user FROM
+        pro_category_property s
+        WHERE s.is_deleted = 0
+        ) category ON category.prop_id = f.id
+        <where>
+            f.is_deleted = 0
+            <if test="property.propCode != null">
+                AND f.prop_code like CONCAT('%',#{property.propCode},'%' )
+            </if>
+            <if test="property.propName != null">
+                AND f.prop_name like CONCAT('%',#{property.propName},'%' )
+            </if>
+            <if test="property.propType != null">
+                AND f.prop_type = #{property.propType}
+            </if>
+            AND category.cate_id = #{property.cateId}
+        </where>
+        ORDER BY f.update_time DESC
+    </select>
+    <!-- 产品类型添加属性页面，查询没类型没有绑定的属性 -->
+    <select id="selectPropertyNotInCategory" resultMap="propertyResultMapPage">
+        SELECT f.id,f.create_time,f.create_time,
+        f.create_user,f.update_time,f.update_user,
+        f.prop_code,f.prop_name,f.prop_type,f.is_required,f.remark,f.show_type FROM pro_property f
+        WHERE NOT EXISTS (SELECT s.prop_id FROM pro_category_property s WHERE s.is_deleted = 0 AND s.prop_id = f.id
+        AND s.cate_id = #{cateId})
+        AND f.is_deleted = 0
+        <if test="propCode != null">
+            AND f.prop_code like CONCAT('%',#{propCode},'%' )
+        </if>
+        <if test="propName != null">
+            AND f.prop_name like CONCAT('%',#{propName},'%' )
+        </if>
+        <if test="propType != null">
+            AND f.prop_type = #{propType}
+        </if>
+        <if test="exclude != null">
+            AND f.id NOT IN
+            <foreach item="item" index="index" collection="exclude.split(',')" open="(" separator="," close=")">
+                '${item}'
+            </foreach>
+        </if>
+        ORDER BY f.update_time DESC
+    </select>
+</mapper>

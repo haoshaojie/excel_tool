@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.user.mapper.OrgUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="orgUserResultMap" type="cn.com.cnfic.contractmanage.user.entity.OrgUser">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="cust_id" property="custId"/>
+        <result column="user_no" property="userNo"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_nickname" property="userNickname"/>
+        <result column="user_birthday" property="userBirthday"/>
+        <result column="user_sex" property="userSex"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="cust_org" property="custOrg"/>
+        <result column="cust_manager" property="custManager"/>
+        <result column="user_type" property="userType"/>
+        <result column="user_tele" property="userTele"/>
+        <result column="user_fax" property="userFax"/>
+        <result column="user_desc" property="userDesc"/>
+        <result column="user_province" property="userProvince"/>
+        <result column="user_city" property="userCity"/>
+        <result column="is_create_account" property="isCreateAccount"/>
+        <result column="invite_code" property="inviteCode"/>
+        <result column="use_person_invite_code" property="usePersonInviteCode"/>
+        <result column="use_com_invite_code" property="useComInviteCode"/>
+        <result column="account_id" property="accountId"/>
+    </resultMap>
+    <resultMap id="orgUserVoResultMap" extends="orgUserResultMap"  type="cn.com.cnfic.contractmanage.user.vo.OrgUserVO">
+        <result column="cust_name" property="custName"/>
+        <result column="cust_code" property="custCode"/>
+        <result column="cust_manager_name" property="custManagerName"/>
+        <result column="org_id" property="custOrgName"/>
+        <result column="create_time" property="originCreateTime"/>
+        <result column="update_time" property="originUpdateTime"/>
+    </resultMap>
+    <resultMap id="orgUserExcelResultMap"   type="cn.com.cnfic.contractmanage.user.vo.OrgUserExcelVO">
+        <result column="cust_name" property="custName"/>
+        <result column="cust_code" property="custCode"/>
+        <result column="user_no" property="userNo"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_sex" property="userSex"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="cust_org" property="custOrg"/>
+        <result column="user_type" property="userType"/>
+        <result column="is_create_account" property="isCreateAccount"/>
+    </resultMap>
+
+    <select id="selectOrgUserPage" resultMap="orgUserVoResultMap">
+        select oc.cust_manager as cust_manager_name,oc.cust_org as org_id,
+        u.id,u.cust_id,u.user_no,u.user_name,u.user_nickname,u.user_birthday,u.user_sex,u.user_email,u.user_phone,u.cust_org,u.cust_manager,u.user_type,u.user_tele,u.user_fax,u.user_desc,u.user_province,u.user_city,u.is_create_account,u.invite_code,u.use_person_invite_code,u.use_com_invite_code,u.account_id,u.create_time,u.create_user,u.update_time,u.update_user,u.is_deleted,
+        c.cust_name,c.cust_code
+         from sub_org_user u
+         left join sub_org_customer c on u.cust_id=c.id
+         left join sub_org_contact oc on u.cust_manager=oc.id
+
+        where u.is_deleted = 0
+        <if test="orgUser.custName != null and orgUser.custName != ''">
+            AND c.cust_name like CONCAT('%',#{orgUser.custName},'%')
+        </if>
+         <if test="orgUser.userName != null and orgUser.userName != ''">
+            AND u.user_name like CONCAT('%',#{orgUser.userName},'%')
+        </if>
+        <if test="orgUser.userEmail != null and orgUser.userEmail != ''">
+            AND u.user_email=#{orgUser.userEmail}
+        </if>
+        <if test="orgUser.userPhone != null and orgUser.userPhone != ''">
+            AND u.user_phone=#{orgUser.userPhone}
+        </if>
+        <if test="orgUser.userNo != null and orgUser.userNo != ''">
+            AND u.user_no=#{orgUser.userNo}
+        </if>
+        <if test="orgUser.custCode != null and orgUser.custCode != ''">
+            AND c.cust_code=#{orgUser.custCode}
+        </if>
+        <if test="orgUser.userTypes != null and orgUser.userTypes != ''">
+            AND    u.user_type IN
+            <foreach collection="orgUser.userTypes" item="userType" index="index" open="(" close=")" separator=",">
+                #{userType}
+            </foreach>
+        </if>
+        <if test="orgUser.isCreateAccount != null">
+            AND u.is_create_account=#{orgUser.isCreateAccount}
+        </if>
+
+        <if test="orgUser.updateTimeStartTime != null and orgUser.updateTimeEndTime != null">
+            and u.update_time between #{orgUser.updateTimeStartTime} and #{orgUser.updateTimeEndTime}
+        </if>
+        <if test="orgUser.createStartTime != null and orgUser.createEndTime != null">
+            and u.create_time between #{orgUser.createStartTime} and #{orgUser.createEndTime}
+        </if>
+
+         order by u.create_time
+    </select>
+    <select id="findByCustomerIds"  resultMap="orgUserExcelResultMap">
+             select
+                u.id,u.cust_id,u.user_no,u.user_name,u.user_nickname,u.user_birthday,u.user_sex,u.user_email,u.user_phone,u.cust_org,u.cust_manager,u.user_type,u.user_tele,u.user_fax,u.user_desc,u.user_province,u.user_city,u.is_create_account,u.invite_code,u.use_person_invite_code,u.use_com_invite_code,u.account_id,u.create_time,u.create_user,u.update_time,u.update_user,u.is_deleted,
+                c.cust_name,c.cust_code
+             from sub_org_user u
+             left join sub_org_customer c on u.cust_id=c.id
+             WHERE u.is_deleted=0 and c.is_deleted=0
+
+         and u.cust_id IN
+        <foreach collection="customerIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+
+    </select>
+
+</mapper>

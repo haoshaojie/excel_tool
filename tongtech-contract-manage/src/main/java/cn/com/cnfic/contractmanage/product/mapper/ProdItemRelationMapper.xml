@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.product.mapper.ProdItemRelationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="prodItemRelationResultMap" type="cn.com.cnfic.contractmanage.product.entity.ProdItemRelation">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="prod_id" property="prodId"/>
+        <result column="item_id" property="itemId"/>
+    </resultMap>
+
+
+    <select id="selectProdItemRelationPage" resultMap="prodItemRelationResultMap">
+        select * from pro_prod_item_relation where is_deleted = 0
+    </select>
+    <delete id="removeByRelationId" parameterType="java.lang.Long">
+        DELETE FROM pro_prod_item_relation
+        WHERE item_id = #{id}
+    </delete>
+</mapper>

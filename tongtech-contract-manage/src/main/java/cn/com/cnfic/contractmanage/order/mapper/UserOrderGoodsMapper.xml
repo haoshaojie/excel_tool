@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.order.mapper.UserOrderGoodsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="userOrderGoodsResultMap" type="cn.com.cnfic.contractmanage.order.entity.UserOrderGoods">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="goods_no" property="goodsNo"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="expired_date" property="expiredDate"/>
+    </resultMap>
+    <!-- 通用查询映射结果VO -->
+    <resultMap id="userOrderGoodsVOResultMap" type="cn.com.cnfic.contractmanage.order.vo.UserOrderGoodsVO">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="goods_no" property="goodsNo"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="expired_date" property="expiredDate"/>
+    </resultMap>
+    <!-- 导出查询映射结果VO -->
+    <resultMap id="userOrderGoodsResultMapExcel" type="cn.com.cnfic.contractmanage.order.vo.UserOrderGoodsVO">
+        <id column="order_goods_id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="goods_no" property="goodsNo"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="expired_date" property="expiredDate"/>
+        <result column="app_code" property="appCode"/>
+        <result column="order_amount" property="orderAmount"/>
+        <result column="order_time" property="orderTime"/>
+        <result column="user_account" property="userAccount"/>
+        <result column="phone_number" property="phoneNumber"/>
+        <result column="mailbox" property="mailbox"/>
+    </resultMap>
+    <!-- 分页查询 -->
+    <select id="selectUserOrderGoodsPage" resultMap="userOrderGoodsResultMap">
+        SELECT g.order_no,g.goods_no,g.goods_price,g.goods_name,g.expired_date,o.order_time
+        FROM con_user_order_goods g
+        LEFT JOIN con_user_order o ON o.order_no = g.order_no AND o.is_deleted = 0
+        <where>
+            g.is_deleted = 0 AND
+            <trim prefix="(" suffix=")" suffixOverrides="OR">
+                <if test="userOrderGoods.phoneNumber != null">
+                    o.phone_number = #{userOrderGoods.phoneNumber}
+                </if>
+                <if test="userOrderGoods.mailbox != null">
+                    OR o.mailbox = #{userOrderGoods.mailbox}
+                </if>
+            </trim>
+        </where>
+        ORDER BY g.expired_date DESC
+    </select>
+    <!-- 多账号订单查询 -->
+    <select id="selectUserOrderGoods" resultMap="userOrderGoodsResultMapExcel">
+        SELECT g.order_no,g.goods_no,g.goods_price,g.goods_name,g.expired_date,o.order_time,o.mailbox,o.phone_number
+        FROM con_user_order_goods g
+        LEFT JOIN con_user_order o ON o.order_no = g.order_no AND o.is_deleted = 0
+        <where>
+            g.is_deleted = 0 AND
+            <foreach item="item" index="index" collection="userOrderGoodsList"
+                     open="" separator="OR" close="">
+                <trim prefix="(" suffix=")" suffixOverrides="OR">
+                    <if test="item.phoneNumber != null">
+                        o.phone_number = #{item.phoneNumber}
+                    </if>
+                    <if test="item.mailbox != null">
+                        OR o.mailbox = #{item.mailbox}
+                    </if>
+                </trim>
+            </foreach>
+        </where>
+        ORDER BY g.expired_date DESC
+    </select>
+    <!--查询列表导出 -->
+    <select id="selectUserOrderGoodsExcel" resultMap="userOrderGoodsResultMapExcel">
+        SELECT
+        o.id,o.order_no,o.order_amount,o.order_time,o.create_time,o.user_account,o.app_code,o.phone_number,o.mailbox,
+        g.id AS order_goods_id,g.goods_no,g.goods_name,g.goods_price,g.expired_date
+        FROM con_user_order o
+        LEFT JOIN con_user_order_goods g ON g.order_no = o.order_no AND g.is_deleted = 0
+        WHERE o.is_deleted = 0
+        <if test="createTimeBegin != null">
+            AND o.create_time &gt;= #{createTimeBegin}
+        </if>
+        <if test="createTimeEnd != null">
+            AND o.create_time &lt;= #{createTimeEnd}
+        </if>
+        <if test="orderNo != null">
+            AND o.order_no = like CONCAT('%',#{orderNo},'%' )
+        </if>
+        <if test="phoneNumber != null">
+            AND o.phone_number like CONCAT('%',#{phoneNumber},'%' )
+        </if>
+        <if test="mailbox != null">
+            AND o.mailbox like CONCAT('%',#{mailbox},'%' )
+        </if>
+        <if test="appCode != null">
+            AND o.app_code = #{appCode}
+        </if>
+        <if test="goodsNo != null or goodsName != null">
+            AND o.order_no in
+            (
+            SELECT g.order_no FROM con_user_order_goods g WHERE g.is_deleted = 0
+            <if test="goodsNo != null">
+                AND g.goods_no like CONCAT('%',#{goodsNo},'%' )
+            </if>
+            <if test="goodsName != null">
+                AND g.goods_name like CONCAT('%',#{goodsName},'%' )
+            </if>
+            )
+        </if>
+        ORDER BY o.order_time DESC,o.id
+    </select>
+</mapper>

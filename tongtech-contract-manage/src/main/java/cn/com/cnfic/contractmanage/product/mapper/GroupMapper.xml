@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.product.mapper.GroupMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="groupResultMap" type="cn.com.cnfic.contractmanage.product.entity.Group">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="prod_name" property="prodName"/>
+        <result column="prop_dept" property="propDept"/>
+        <result column="pro_image" property="proImage"/>
+        <result column="added_date" property="addedDate"/>
+        <result column="expired_date" property="expiredDate"/>
+        <result column="discount" property="discount"/>
+        <result column="prod_state" property="prodState"/>
+    </resultMap>
+
+    <sql id="updateState">
+        prod_state = #{group.prodState}
+        <if test="group.addedDate != null">
+            ,added_date = #{group.addedDate}
+        </if>
+        <if test="group.expiredDate != null">
+            ,expired_date = #{group.expiredDate}
+        </if>
+    </sql>
+
+    <select id="selectGroupPage" resultMap="groupResultMap">
+        select * from pro_group where is_deleted = 0
+    </select>
+    <select id="selectCountByGroupId" resultType="java.lang.Integer">
+        select count(*) from pro_group
+        <where>
+            is_deleted = 0
+            <if test="prodState !=null">
+                and prod_state = #{prodState}
+            </if>
+            <if test="ids !=null">
+                <foreach collection="ids" index="index" item="id" open=" and id in (" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <update id="updateGroupState">
+        UPDATE pro_group
+        SET
+        <include refid="updateState"></include>
+        <where>
+            <foreach collection="ids" index="index" item="id" open=" id in (" separator="," close=")">
+                #{id}
+            </foreach>
+        </where>
+    </update>
+    <update id="updateByGroupId" parameterType="cn.com.cnfic.contractmanage.product.entity.Group">
+        UPDATE pro_group
+        SET id = #{id}
+        <if test="prodName !=null and prodName !=''">
+            ,prod_name = #{prodName}
+        </if>
+        <if test="propDept !=null and propDept !=''">
+            ,prop_dept = #{propDept}
+        </if>
+        <if test="addedDate !=null">
+            ,added_date = #{addedDate}
+        </if>
+        <if test="expiredDate !=null">
+            ,expired_date = #{expiredDate}
+        </if>
+        <if test="prodState !=null and prodState !=''">
+            ,prod_state = #{prodState}
+        </if>
+        <if test="updateTime !=null">
+            ,update_time = #{updateTime}
+        </if>
+        <if test="updateUser !=null and updateUser !=''">
+            ,update_user = #{updateUser}
+        </if>
+        WHERE
+            id = #{id}
+    </update>
+</mapper>

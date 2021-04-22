@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.user.mapper.PersonalUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="personalUserResultMap" type="cn.com.cnfic.contractmanage.user.entity.PersonalUser">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="user_no" property="userNo"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_nickname" property="userNickname"/>
+        <result column="user_birthday" property="userBirthday"/>
+        <result column="user_province" property="userProvince"/>
+        <result column="user_city" property="userCity"/>
+        <result column="regist_channel" property="registChannel"/>
+        <result column="user_company" property="userCompany"/>
+        <result column="user_job" property="userJob"/>
+        <result column="user_industry" property="userIndustry"/>
+        <result column="user_profile" property="userProfile"/>
+        <result column="invite_code" property="inviteCode"/>
+        <result column="use_person_invite_code" property="usePersonInviteCode"/>
+        <result column="use_com_invite_code" property="useComInviteCode"/>
+        <result column="account_id" property="accountId"/>
+        <result column="register_time" property="registerTime"/>
+    </resultMap>
+    <resultMap id="personalUserVOResultMap" extends="personalUserResultMap"  type="cn.com.cnfic.contractmanage.user.vo.PersonalUserVO">
+        <result column="create_time" property="originCreateTime"/>
+        <result column="update_time" property="originUpdateTime"/>
+    </resultMap>
+
+    <select id="selectPersonalUserPage" resultMap="personalUserVOResultMap">
+        select * from sub_personal_user u
+         where is_deleted = 0
+         <if test="personalUser.userNickname">
+
+         </if>
+        <if test="personalUser.userNickname != null and personalUser.userNickname != ''">
+            AND u.user_nickname like CONCAT('%',#{personalUser.userNickname},'%')
+        </if>
+        <if test="personalUser.userPhone != null and personalUser.userPhone != ''">
+            AND u.user_phone = #{personalUser.userPhone}
+        </if>
+        <if test="personalUser.userEmail != null and personalUser.userEmail != ''">
+            AND u.user_email = #{personalUser.userEmail}
+        </if>
+        <if test="personalUser.userName != null and personalUser.userName != ''">
+            AND u.user_name like CONCAT('%',#{personalUser.userName},'%')
+        </if>
+          <if test="personalUser.registChannel != null and personalUser.registChannel != ''">
+            AND u.regist_channel =#{personalUser.registChannel}
+        </if>
+        <if test="personalUser.createStartTime != null and personalUser.createEndTime != null">
+            and u.create_time between #{personalUser.createStartTime} and #{personalUser.createEndTime}
+        </if>
+    </select>
+
+    <update id="updatePersonalUserByAccount">
+        UPDATE sub_personal_user
+        SET account_id = #{personalUser.accountId}
+        <if test="personalUser.userNo !=null and personalUser.userNo !=''">
+            , user_no = #{personalUser.userNo}
+        </if>
+        <if test="personalUser.userPhone !=null and personalUser.userPhone !=''">
+            , user_phone = #{personalUser.userPhone}
+        </if>
+        <if test="personalUser.userEmail !=null and personalUser.userEmail !=''">
+            , user_email = #{personalUser.userEmail}
+        </if>
+        <if test="personalUser.userName !=null and personalUser.userName !=''">
+            , user_name = #{personalUser.userName}
+        </if>
+        <if test="personalUser.userNickname !=null and personalUser.userNickname !=''">
+            , user_nickname = #{personalUser.userNickname}
+        </if>
+        <if test="personalUser.userBirthday !=null and personalUser.userBirthday !=''">
+            , user_birthday = #{personalUser.userBirthday}
+        </if>
+        <if test="personalUser.userProvince !=null and personalUser.userProvince !=''">
+            , user_province = #{personalUser.userProvince}
+        </if>
+        <if test="personalUser.userCity !=null and personalUser.userCity !=''">
+            , user_city = #{personalUser.userCity}
+        </if>
+        <if test="personalUser.registChannel !=null and personalUser.registChannel !=''">
+            , regist_channel = #{personalUser.registChannel}
+        </if>
+        <if test="personalUser.userCompany !=null and personalUser.userCompany !=''">
+            , user_company = #{personalUser.userCompany}
+        </if>
+        <if test="personalUser.userJob !=null and personalUser.userJob !=''">
+            , user_job = #{personalUser.userJob}
+        </if>
+        <if test="personalUser.userIndustry !=null and personalUser.userIndustry !=''">
+            , user_industry = #{personalUser.userIndustry}
+        </if>
+        <if test="personalUser.userProfile !=null and personalUser.userProfile !=''">
+            , user_profile = #{personalUser.userProfile}
+        </if>
+        <if test="personalUser.inviteCode !=null and personalUser.inviteCode !=''">
+            , invite_code = #{personalUser.inviteCode}
+        </if>
+        <if test="personalUser.usePersonInviteCode !=null and personalUser.usePersonInviteCode !=''">
+            , use_person_invite_code = #{personalUser.usePersonInviteCode}
+        </if>
+        <if test="personalUser.useComInviteCode !=null and personalUser.useComInviteCode !=''">
+            , use_com_invite_code = #{personalUser.useComInviteCode}
+        </if>
+        <if test="personalUser.registerTime !=null and personalUser.registerTime !=''">
+            , register_time = #{personalUser.registerTime}
+        </if>
+        WHERE is_deleted = 0 and account_id = #{personalUser.accountId}
+    </update>
+
+</mapper>

@@ -1,0 +1,64 @@
+#服务器端口
+server:
+  port: 8300
+
+#swagger配置
+swagger:
+  #扫描路径
+  base-packages:
+    - cn.com.cnfic
+
+#数据源配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://192.168.111.10:4000/xinhua_finance?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8
+#    username: tongtech
+#    password: tongtech123
+    url: jdbc:mysql://localhost:3306/xinhua_finance?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8
+    username: root
+    password: 9h0s1j01
+
+  # redis 配置
+  redis:
+    # 地址
+    host: 192.168.111.11
+    # 端口，默认为6379
+    port: 6379
+    # 密码
+    password:
+    # 连接超时时间
+    timeout: 10s
+    lettuce:
+      pool:
+        # 连接池中的最小空闲连接
+        min-idle: 10
+        # 连接池中的最大空闲连接
+        max-idle: 30
+        # 连接池的最大数据库连接数
+        max-active: 30
+        # #连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+
+#knife4j配置
+knife4j:
+  #启用
+  enable: true
+  #基础认证
+  basic:
+    enable: false
+    username: cnfic
+    password: cnfic
+  #增强配置
+  setting:
+    enableSwaggerModels: true
+    enableDocumentManage: true
+    enableHost: false
+    enableHostText: http://localhost
+    enableRequestCache: true
+    enableFilterMultipartApis: false
+    enableFilterMultipartApiMethodType: POST
+    language: zh-CN
+    enableFooter: false
+    enableFooterCustom: true
+    footerCustomContent: Copyright © 2021-2099 Cnfic-UserManage All Rights Reserved

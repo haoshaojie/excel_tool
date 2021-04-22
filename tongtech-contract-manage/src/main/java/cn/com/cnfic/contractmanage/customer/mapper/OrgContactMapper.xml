@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.customer.mapper.OrgContactMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="orgContactResultMap" type="cn.com.cnfic.contractmanage.customer.entity.OrgContact">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="cust_id" property="custId"/>
+        <result column="cust_manager" property="custManager"/>
+        <result column="cust_org" property="custOrg"/>
+        <result column="contact_person" property="contactPerson"/>
+        <result column="contact_type" property="contactType"/>
+        <result column="contact_phone" property="contactPhone"/>
+        <result column="contact_email" property="contactEmail"/>
+        <result column="contact_dept" property="contactDept"/>
+        <result column="contact_job" property="contactJob"/>
+    </resultMap>
+    <resultMap id="orgContactVOResultMap" type="cn.com.cnfic.contractmanage.customer.vo.OrgContactVO" extends="orgContactResultMap">
+        <result column="cust_code" property="custCode"/>
+        <result column="cust_name" property="custName"/>
+        <result column="dept_name" property="custOrgName"/>
+    </resultMap>
+    <update id="deleteLogicByCustomerId">
+        update sub_org_contact set is_deleted=1 where cust_id=#{id}
+    </update>
+
+
+    <select id="selectOrgContactPage" resultMap="orgContactResultMap">
+        select * from sub_org_contact where is_deleted = 0
+    </select>
+    <select id="findByCustomerIds" resultMap="orgContactVOResultMap">
+        select c1.cust_code,c1.cust_name,d.dept_name,
+         c.id, c.cust_id, c.cust_manager, c.cust_org, c.contact_person, c.contact_type, c.contact_phone, c.contact_email, c.contact_dept,c.contact_job,c.create_time,c.create_user,c.update_time,c.update_user,c.is_deleted
+         from sub_org_contact c
+         left join sub_org_customer  c1 on c.cust_id=c1.id
+         left join sys_dept d on c.cust_org=d.id
+        WHERE c.is_deleted=0 and c.cust_id IN
+        <foreach collection="customerIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+
+    </select>
+
+</mapper>
+

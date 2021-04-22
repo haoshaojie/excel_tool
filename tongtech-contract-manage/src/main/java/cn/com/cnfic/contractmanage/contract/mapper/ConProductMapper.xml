@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.contract.mapper.ConProductMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="productResultMap" type="cn.com.cnfic.contractmanage.contract.entity.ConProduct">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="con_id" property="conId"/>
+        <result column="type" property="type"/>
+        <result column="prod_id" property="prodId"/>
+        <result column="prod_price" property="prodPrice"/>
+        <result column="currency" property="currency"/>
+        <result column="num" property="num"/>
+        <result column="user_num" property="userNum"/>
+        <result column="amount" property="amount"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+    </resultMap>
+
+
+    <select id="selectProductPage" resultMap="productResultMap">
+        select * from con_product where is_deleted = 0
+    </select>
+
+    <select id="getProductAndValues" resultType="cn.com.cnfic.contractmanage.contract.vo.ExcelProductVO">
+        SELECT
+        cp.con_id AS conId,
+        cp.prod_id AS prodId,
+        pp.prod_code AS propCode,
+        pp.prod_name AS prodName,
+        dept.dept_name AS deptName,
+        sd.dict_value AS appCategory,
+        pp.prod_desc AS prodDesc,
+        proRange.dict_value AS productRange,
+        pp.added_date AS addedDate,
+        pp.expired_date AS expiredDate,
+        pv.valuation_values AS valuationValues,
+        pv.standard_price AS standardPrice,
+        pv.promotion_price AS promotionPrice,
+        currency.dict_value AS currency
+        FROM
+        con_product cp
+        LEFT JOIN
+        pro_product pp ON cp.prod_id = pp.id
+        LEFT JOIN
+        sys_dict sd ON sd.dict_key = pp.prod_type
+        AND sd.code = 'product_type'
+        LEFT JOIN
+        sys_dept dept ON pp.prop_dept = dept.id
+        LEFT JOIN
+        sys_dict proRange ON proRange.dict_key = pp.release_scope
+        AND proRange.code = 'product_range'
+        LEFT JOIN
+        pro_valuation pv ON pv.prod_id = pp.id AND pv.is_deleted = 0
+        LEFT JOIN
+        sys_dict currency ON currency.dict_key = pv.currency
+        AND proRange.code = 'currency_type'
+        AND cp.id in
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getProductItemAndValues" resultType="cn.com.cnfic.contractmanage.contract.vo.ExcelProductVO">
+        SELECT
+        cp.con_id AS conId,
+        cp.prod_id AS prodId,
+        pi.prop_code AS propCode,
+        pi.prop_name AS prodName,
+        dept.dept_name AS deptName,
+        category.cate_name AS cateName,
+        proRange.dict_value AS productRange,
+        pi.item_desc AS prodDesc,
+        pi.added_date AS addedDate,
+        pi.expired_date AS expiredDate,
+        pv.valuation_values AS valuationValues,
+        pv.standard_price AS standardPrice,
+        pv.promotion_price AS promotionPrice,
+        currency.dict_value AS currency
+        FROM
+        con_product cp
+        LEFT JOIN
+        pro_product_item pi ON cp.prod_id = pi.id
+        LEFT JOIN
+        pro_category category ON pi.cate_id = category.id
+        LEFT JOIN
+        sys_dept dept ON pi.prop_dept = dept.id
+        LEFT JOIN
+        sys_dict proRange ON proRange.dict_key = pi.release_scope
+        AND proRange.code = 'product_range'
+        LEFT JOIN
+        pro_valuation pv ON pv.prod_id = pi.id AND pv.is_deleted = 0
+        LEFT JOIN
+        sys_dict currency ON currency.dict_key = pv.currency
+        AND proRange.code = 'currency_type'
+        AND cp.id in
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.product.mapper.CategoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="categoryResultMap" type="cn.com.cnfic.contractmanage.product.entity.Category">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="cate_name" property="cateName"/>
+        <result column="cate_code" property="cateCode"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+    <!-- 列表查询映射结果 -->
+    <resultMap id="categoryResultMapList" type="cn.com.cnfic.contractmanage.product.entity.Category">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="cate_name" property="cateName"/>
+        <result column="cate_code" property="cateCode"/>
+        <result column="remark" property="remark"/>
+        <result column="product_item_count" property="productItemCount"/>
+    </resultMap>
+
+    <select id="selectCategoryPage" resultMap="categoryResultMapList">
+        SELECT f.id,f.create_time,f.create_time,
+        f.create_user,f.update_time,f.update_user,f.cate_name,f.cate_code,f.remark
+        ,item.product_item_count
+        FROM pro_category f
+        LEFT JOIN ( SELECT s.cate_id,COUNT(s.id) AS product_item_count FROM pro_product_item s WHERE s.is_deleted = 0
+        GROUP BY
+        s.cate_id) item ON item.cate_id = f.id
+        <if test="category.propId != null">
+            LEFT JOIN pro_category_property prop ON prop.cate_id = f.id AND prop.is_deleted = 0
+        </if>
+        <where>
+            f.is_deleted = 0
+            <if test="category.cateName != null">
+                AND f.cate_name like CONCAT('%',#{category.cateName},'%' )
+            </if>
+            <if test="category.cateCode != null">
+                AND f.cate_code like CONCAT('%',#{category.cateCode},'%' )
+            </if>
+            <if test="category.propId != null">
+                AND prop.prop_id = #{category.propId}
+            </if>
+        </where>
+        ORDER BY f.update_time DESC
+    </select>
+    <!-- 判断类型编码或者名称是否重复 -->
+    <select id="selectCategoryByCodeOrName" resultType="Integer">
+        SELECT count(*) FROM pro_category
+        <where>
+            is_deleted = 0
+            <if test="cateCode != null">
+                AND ( cate_code = #{cateCode}
+            </if>
+            <if test="cateName != null">
+                OR cate_name = #{cateName} )
+            </if>
+            <if test="id != null">
+                AND id &lt;&gt; #{id}
+            </if>
+        </where>
+    </select>
+</mapper>

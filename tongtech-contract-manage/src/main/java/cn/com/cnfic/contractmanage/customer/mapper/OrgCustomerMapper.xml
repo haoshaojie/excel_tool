@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.customer.mapper.OrgCustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="orgCustomerResultMap" type="cn.com.cnfic.contractmanage.customer.vo.OrgCustomerVO">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="cust_code" property="custCode"/>
+        <result column="cust_name" property="custName"/>
+        <result column="is_check" property="isCheck"/>
+        <result column="cust_province" property="custProvince"/>
+        <result column="cust_city" property="custCity"/>
+        <result column="cust_address" property="custAddress"/>
+        <result column="cust_industry" property="custIndustry"/>
+        <result column="cust_type" property="custType"/>
+        <result column="cust_org" property="custOrg"/>
+        <result column="postcode" property="postcode"/>
+        <result column="com_website" property="comWebsite"/>
+        <result column="com_phone" property="comPhone"/>
+        <result column="com_fax" property="comFax"/>
+        <result column="super_unit" property="superUnit"/>
+        <result column="business_desc" property="businessDesc"/>
+        <result column="cust_state" property="custState"/>
+        <result column="business_chance" property="businessChance"/>
+        <result column="is_black" property="isBlack"/>
+
+        <result column="regionName" property="regionName"/>
+        <result column="createUserName" property="createUserName"/>
+        <result column="updateUserName" property="updateUserName"/>
+        <result column="custIndustryName" property="custIndustryName"/>
+        <result column="custTypeName" property="custTypeName"/>
+        <result column="custStateName" property="custStateName"/>
+        <result column="origin_create_time" property="originCreateTime"/>
+        <result column="origin_update_time" property="originUpdateTime"/>
+        <result column="business_chance_name" property="businessChanceName"/>
+        <result column="super_unit_name" property="superUnitName"/>
+        <result column="first_name" property="firstName"/>
+        <result column="second_name" property="secondName"/>
+        <result column="third_name" property="thirdName"/>
+    </resultMap>
+
+
+    <select id="selectOrgCustomerPage" resultMap="orgCustomerResultMap">
+        select su.cust_name as super_unit_name,c.create_time origin_create_time,c.update_time origin_update_time,
+         c.id,c.cust_code,c.cust_name,c.is_check,c.cust_province,c.cust_city,c.cust_address,c.cust_industry,c.cust_type,c.cust_org,c.postcode,c.com_website,c.com_phone,c.com_fax,c.super_unit,c.business_desc,c.cust_state,c.business_chance,custType3.dict_value as business_chance_name,c.is_black,c.create_time,c.create_user,c.update_time,c.update_user,c.is_deleted,
+       u1.name as createUserName,u2.name as updateUserName,c1.name as custIndustryName,
+        custType.dict_value as custTypeName,
+        custType2.dict_value as custStateName,c1.first_name,c1.second_name,c1.third_name
+         from sub_org_customer c
+         left join sub_org_customer as su on c.super_unit=su.id
+         left join sys_user as u1 on c.create_user=u1.id
+          left join sys_user as u2 on c.update_user=u2.id
+          left join sub_org_cust c1 on c1.ancestors=c.cust_industry
+          left join (select  dict_key,dict_value from sys_dict where code ='cust_type' ) custType on c.cust_type=custType.dict_key
+          left join (select  dict_key,dict_value from sys_dict where code ='cust_state' ) custType2 on c.cust_state=custType2.dict_key
+          left join (select  dict_key,dict_value from sys_dict where code ='business_chance' ) custType3 on c.business_chance=custType3.dict_key
+          where c.is_deleted = 0
+        <if test="orgCustomer.custName != null and orgCustomer.custName != ''">
+            AND c.cust_name like CONCAT('%',#{orgCustomer.custName},'%')
+        </if>
+        <if test="orgCustomer.custProvince != null and orgCustomer.custProvince != ''">
+            AND c.cust_province like CONCAT(#{orgCustomer.custProvince},'%')
+        </if>
+        <if test="orgCustomer.custCode != null and orgCustomer.custCode != ''">
+            AND c.cust_code  like CONCAT('%',#{orgCustomer.custCode},'%')
+        </if>
+        <if test="orgCustomer.custTypeName != null and orgCustomer.custTypeName != ''">
+            AND c.cust_type =#{orgCustomer.custTypeName}
+        </if>
+        <if test="orgCustomer.custState != null and orgCustomer.custState != ''">
+            AND c.cust_state =#{orgCustomer.custState}
+        </if>
+         <if test="orgCustomer.sbSql != null and orgCustomer.sbSql != ''">
+             ${orgCustomer.sbSql}
+        </if>
+        <if test="orgCustomer.updateTimeStartTime != null and orgCustomer.updateTimeEndTime != null">
+            and c.update_time between #{orgCustomer.updateTimeStartTime} and #{orgCustomer.updateTimeEndTime}
+        </if>
+        <if test="orgCustomer.createStartTime != null and orgCustomer.createEndTime != null">
+            and c.create_time between #{orgCustomer.createStartTime} and #{orgCustomer.createEndTime}
+        </if>
+        order by create_time desc
+    </select>
+    <select id="getDetailById" resultMap="orgCustomerResultMap">
+ select su.cust_name as super_unit_name,c.create_time origin_create_time,c.update_time origin_update_time,
+         c.id,c.cust_code,c.cust_name,c.is_check,c.cust_province,c.cust_city,c.cust_address,c.cust_industry,c.cust_type,c.cust_org,c.postcode,c.com_website,c.com_phone,c.com_fax,c.super_unit,c.business_desc,c.cust_state,c.business_chance,custType3.dict_value as business_chance_name,c.is_black,c.create_time,c.create_user,c.update_time,c.update_user,c.is_deleted,
+        CONCAT(r.province_name,'/',r.city_name,'/',r.district_name) as regionName,u1.name as createUserName,u2.name as updateUserName,c1.name as custIndustryName,
+        custType.dict_value as custTypeName,
+        custType2.dict_value as custStateName,c1.first_name,c1.second_name,c1.third_name
+         from sub_org_customer c
+         left join sub_org_customer as su on c.super_unit=su.id
+         left join sys_region as r on c.cust_province=r.code
+         left join sys_user as u1 on c.create_user=u1.id
+          left join sys_user as u2 on c.update_user=u2.id
+          left join sub_org_cust c1 on c1.ancestors=c.cust_industry
+          left join (select  dict_key,dict_value from sys_dict where code ='cust_type' ) custType on c.cust_type=custType.dict_key
+          left join (select  dict_key,dict_value from sys_dict where code ='cust_state' ) custType2 on c.cust_state=custType2.dict_key
+          left join (select  dict_key,dict_value from sys_dict where code ='business_chance' ) custType3 on c.business_chance=custType3.dict_key
+          where c.is_deleted = 0 and c.id=#{id}
+    </select>
+
+
+</mapper>

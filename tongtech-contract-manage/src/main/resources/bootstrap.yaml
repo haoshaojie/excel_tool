@@ -1,0 +1,20 @@
+server:
+  port: 8300
+
+# 部署的命名空间
+deploy:
+  namespace: cnfic-usermanage
+
+spring:
+  application:
+    name: cnfic-contract-manage
+  cloud:
+    kubernetes:
+      config:
+        name: ${spring.application.name}
+        namespace: ${deploy.namespace}
+        sources:
+          #需要加载的配置映射文件的名称
+          - name: cnfic
+            #配置映射文件所对应的命名空间
+            namespace: ${deploy.namespace}

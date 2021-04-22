@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.customer.mapper.OrgActivityMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="orgActivityResultMap" type="cn.com.cnfic.contractmanage.customer.entity.OrgActivity">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="cust_id" property="custId"/>
+        <result column="activity_no" property="activityNo"/>
+        <result column="activity_type" property="activityType"/>
+        <result column="activity_content" property="activityContent"/>
+    </resultMap>
+    <resultMap id="orgActivityVoResultMap" type="cn.com.cnfic.contractmanage.customer.vo.OrgActivityVO"
+               extends="orgActivityResultMap">
+        <result column="activity_type_name" property="exportActivityTypeName"/>
+        <result column="cust_code" property="custCode"/>
+        <result column="cust_name" property="custName"/>
+    </resultMap>
+    <update id="deleteLogicByCustomerId">
+        update sub_org_activity set is_deleted=1 where cust_id=#{id}
+    </update>
+
+
+    <select id="selectOrgActivityPage" resultMap="orgActivityResultMap">
+        select * from sub_org_activity where is_deleted = 0
+    </select>
+    <select id="findByCustomerIds" resultMap="orgActivityVoResultMap">
+        select c.cust_code,c.cust_name,a1.dict_value as activity_type_name
+        ,a.id,a.cust_id,a.activity_no,a.activity_type,a.activity_content,a.create_time,a.create_user,a.update_time,a.update_user,a.is_deleted
+        from sub_org_activity a
+        left join (select dict_key,dict_value from sys_dict where code ='activity_type' ) a1 on
+        a.activity_type=a1.dict_key
+        left join sub_org_customer c on a.cust_id=c.id
+        where a.is_deleted=0 and a.cust_id IN
+        <foreach collection="customerIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

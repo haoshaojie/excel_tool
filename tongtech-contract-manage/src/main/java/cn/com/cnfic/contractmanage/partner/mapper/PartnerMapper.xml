@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.partner.mapper.PartnerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="partnerResultMap" type="cn.com.cnfic.contractmanage.partner.vo.PartnerVO">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="par_code" property="parCode"/>
+        <result column="par_name" property="parName"/>
+        <result column="par_type" property="parType"/>
+        <result column="area" property="area"/>
+        <result column="leader_person" property="leaderPerson"/>
+        <result column="user_telphone" property="userTelphone"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="user_phone" property="userPhone"/>
+        <result column="address" property="address"/>
+        <result column="remark" property="remark"/>
+        <result column="manager_name" property="managerName"/>
+        <result column="manager_org" property="managerOrg"/>
+
+        <result column="areaName" property="areaName"/>
+        <result column="createUserName" property="createUserName"/>
+        <result column="updateUserName" property="updateUserName"/>
+
+        <!-- 合作商分润明细统计 -->
+        <result column="customerTotal" property="customerTotal"/>
+        <result column="userTotal" property="userTotal"/>
+        <result column="total" property="total"/>
+    </resultMap>
+
+    <!-- 合作商产品项、产品 -->
+    <resultMap id="partnerProductMap" type="cn.com.cnfic.contractmanage.partner.vo.PartnerProductVO">
+        <id column="id" property="id"/>
+        <result column="partner_id" property="partnerId"/>
+        <result column="prop_dept" property="propDept"/>
+        <result column="deptName" property="deptName"/>
+        <result column="prod_code" property="prodCode"/>
+        <result column="prod_name" property="prodName"/>
+        <result column="added_date" property="addedDate"/>
+        <result column="expired_date" property="expiredDate"/>
+        <result column="create_user" property="createUser"/>
+        <result column="createUserName" property="createUserName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <!-- 合作商查询 -->
+    <select id="selectPartnerPage" resultMap="partnerResultMap">
+        select a.*,CONCAT(b.province_name,'>',b.city_name,'>',b.district_name) as areaName,c.name as
+        createUserName,d.name as updateUserName from pro_partner as a
+        left join sys_region as b on a.area=b.code
+        left join sys_user as c on a.create_user=c.id
+        left join sys_user as d on a.update_user=d.id
+        where a.is_deleted = 0
+        <if test="partner.parType != null">
+            AND a.par_type=#{partner.parType}
+        </if>
+        <if test="partner.parCode != null and partner.parCode != ''">
+            AND a.par_code like CONCAT('%',#{partner.parCode},'%')
+        </if>
+        <if test="partner.parName != null and partner.parName != ''">
+            AND a.par_name like CONCAT('%',#{partner.parName},'%')
+        </if>
+        ORDER BY a.update_time DESC
+    </select>
+
+    <!-- 查询合作商的产品/产品项 -->
+    <select id="selectPartnerProductPage" resultMap="partnerProductMap">
+        select a.*,b.name as createUserName,c.dept_name as deptName from (
+        select id,partner_id ,prop_dept,prod_code,prod_name, added_date,expired_date,
+        create_user,create_time,is_deleted,
+        case prod_state when 1 then 1 ELSE 2 END as isValid
+        from pro_product
+        where is_deleted=0
+        union
+        select id,partner_id as partner_id,prop_dept,prop_code as prod_code,prop_name as
+        prod_name,added_date,expired_date,create_user,create_time,is_deleted,
+        case item_state when 1 then 1 ELSE 2 END as isValid
+        from pro_product_item
+        where is_deleted=0
+        ) as a
+        left join sys_user as b on a.create_user=b.id
+        left join sys_dept as c on a.prop_dept=c.id
+        <where>
+            a.is_deleted = 0
+            <if test="partnerProduct.partnerIds != null">
+                AND a.partner_id IN
+                <foreach collection="partnerProduct.partnerIds" item="partnerId" index="index" open="(" close=")"
+                         separator=",">
+                    #{partnerId}
+                </foreach>
+            </if>
+            <if test="partnerProduct.partnerId != null">
+                AND a.partner_id = #{partnerProduct.partnerId}
+            </if>
+            <if test="partnerProduct.isValid != null">
+                AND a.isValid = #{partnerProduct.isValid}
+            </if>
+            <if test="partnerProduct.prodCode != null">
+                AND a.prod_code like CONCAT('%',#{partnerProduct.prodCode},'%')
+            </if>
+            <if test="partnerProduct.prodName != null">
+                AND a.prod_name like CONCAT('%',#{partnerProduct.prodName},'%')
+            </if>
+        </where>
+        ORDER BY a.expired_date
+    </select>
+
+    <!-- 查询合作商的分润明细 -->
+    <select id="selectOrderProfitTotalPage" resultMap="partnerResultMap">
+        select a.id,a.par_code,a.par_name,b.customerTotal,c.userTotal,d.total from pro_partner as a
+        left join
+        (select par_id,par_name,sum(profit_amount) as customerTotal from con_order_profit
+        where con_id > ''
+        group by par_id,par_name) as b
+        on a.id=b.par_id
+        left join
+        (select par_id,par_name,sum(profit_amount) as userTotal from con_order_profit
+        where order_id > ''
+        group by par_id,par_name) as c
+        on a.id=c.par_id
+        left join
+        (select par_id,par_name,sum(profit_amount) as total from con_order_profit
+        group by par_id,par_name) as d
+        on a.id=d.par_id
+        <where>
+            a.is_deleted = 0
+            <if test="orderProfitTotal.parCode != null">
+                AND a.par_code like CONCAT('%',#{orderProfitTotal.parCode},'%')
+            </if>
+            <if test="orderProfitTotal.parName != null">
+                AND a.par_name like CONCAT('%',#{orderProfitTotal.parName},'%')
+            </if>
+        </where>
+        ORDER BY a.update_time DESC
+    </select>
+
+
+</mapper>

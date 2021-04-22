@@ -1,0 +1,21 @@
+stages:
+  - name: package
+    steps:
+      - runScriptConfig:
+          image: maven:3.6.3-openjdk-11
+          shellScript: |-
+            date "+%Y%m%d%H%M%S">buildTime.t
+            export buildTime=`cat buildTime.t`
+            mvn clean compile jib:build -Dmaven.test.skip=true -Ddocker.profiles.active=test -Ddocker.build.timestamp=$buildTime  -s ./mvn-settings.xml
+  - name: deploy
+    steps:
+      - runScriptConfig:
+          image: rancher/pipeline-tools:v0.1.15
+          shellScript: |-
+            export buildTime=`cat buildTime.t`
+            kubectl set image deployment/cnfic-contract-manage cnfic-contract-manage=docker-public.tongtech.top/cnfic-usermanage/cnfic-contract-manage:$buildTime-test -n cnfic-usermanage
+timeout: 60
+branch:
+  include:
+    - dev
+notification: { }

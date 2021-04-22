@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.blackList.mapper.BlackWhiteListMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="blackWhiteListResultMap" type="cn.com.cnfic.contractmanage.blackList.entity.BlackWhiteList">
+        <id column="id" property="id"/>
+        <result column="cust_id" property="custId"/>
+        <result column="cust_name" property="custName"/>
+        <result column="data_code" property="dataCode"/>
+        <result column="exchange" property="exchange"/>
+        <result column="type" property="type"/>
+        <result column="source" property="source"/>
+        <result column="audit_user" property="auditUser"/>
+        <result column="audit_state" property="auditState"/>
+        <result column="audit_time" property="auditTime"/>
+        <result column="audit_result" property="auditResult"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <select id="selectExport" resultType="cn.com.cnfic.contractmanage.blackList.excel.BlackWhiteListExport">
+        SELECT id, cust_name, cust_code, data_code, exchange, type, remark, audit_state FROM sub_black_white_list ${ew.customSqlSegment}
+    </select>
+
+    <select id="selectBlackWhiteListPage" resultMap="blackWhiteListResultMap">
+        select *
+        from sub_black_white_list
+        where is_deleted = 0
+    </select>
+
+</mapper>

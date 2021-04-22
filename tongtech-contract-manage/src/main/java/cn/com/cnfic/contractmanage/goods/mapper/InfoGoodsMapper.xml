@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.goods.mapper.InfoGoodsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="infoGoodsResultMap" type="cn.com.cnfic.contractmanage.goods.entity.InfoGoods">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="goods_title" property="goodsTitle"/>
+        <result column="sub_title" property="subTitle"/>
+        <result column="abstract" property="abstractContent"/>
+        <result column="author" property="author"/>
+        <result column="editor" property="editor"/>
+        <result column="is_original" property="isOriginal"/>
+        <result column="source" property="source"/>
+        <result column="price" property="price"/>
+        <result column="online_time" property="onlineTime"/>
+        <result column="syn_time" property="synTime"/>
+        <result column="state" property="state"/>
+        <result column="dispose_suggest" property="disposeSuggest"/>
+        <result column="dispose_time" property="disposeTime"/>
+        <result column="dispose_user" property="disposeUser"/>
+        <result column="invalid_time" property="invalidTime"/>
+    </resultMap>
+    <!-- 通用查询映射结果VO -->
+    <resultMap id="infoGoodsVOResultMap" type="cn.com.cnfic.contractmanage.goods.vo.InfoGoodsVO">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="goods_title" property="goodsTitle"/>
+        <result column="sub_title" property="subTitle"/>
+        <result column="abstract" property="abstractContent"/>
+        <result column="author" property="author"/>
+        <result column="editor" property="editor"/>
+        <result column="is_original" property="isOriginal"/>
+        <result column="source" property="source"/>
+        <result column="price" property="price"/>
+        <result column="online_time" property="onlineTime"/>
+        <result column="syn_time" property="synTime"/>
+        <result column="state" property="state"/>
+        <result column="dispose_suggest" property="disposeSuggest"/>
+        <result column="dispose_time" property="disposeTime"/>
+        <result column="dispose_user" property="disposeUser"/>
+        <result column="invalid_time" property="invalidTime"/>
+        <result column="type" property="type"/>
+    </resultMap>
+
+    <!-- 联合资讯和研报查询 -->
+    <select id="selectUnionGoodsPage" resultMap="infoGoodsVOResultMap">
+        select
+        ab.id,ab.create_time,ab.create_user,ab.update_time,ab.update_user,ab.is_deleted,ab.goods_id,ab.goods_title,
+        ab.sub_title,ab.abstract,ab.author,ab.editor,ab.is_original,ab.source,
+        ab.price,ab.online_time,ab.syn_time,ab.state,ab.dispose_suggest,ab.dispose_time,ab.dispose_user,ab.invalid_time,
+        ab.type FROM (
+        SELECT a.id,a.create_time,a.create_user,a.update_time,a.update_user,a.is_deleted,a.goods_id,a.goods_title,
+        a.sub_title,a.abstract,a.author,a.editor,a.is_original,a.source,
+        a.price,a.online_time,a.syn_time,a.state,a.dispose_suggest,a.dispose_time,a.dispose_user,a.invalid_time,
+        1 AS type
+        FROM pro_info_goods a
+        UNION ALL
+        SELECT b.id,b.create_time,b.create_user,b.update_time,b.update_user,b.is_deleted,b.goods_id,b.goods_title,
+        b.sub_title,b.abstract,b.author,b.editor,b.is_original,b.source,
+        b.price,b.online_time,b.syn_time,b.state,b.dispose_suggest,b.dispose_time,b.dispose_user,b.invalid_time,
+        2 AS type
+        FROM pro_report_goods b
+        ) ab
+        where ab.is_deleted = 0
+        <if test="infoGoods.goodsTitle != null">
+            AND ab.goods_title like CONCAT('%',#{infoGoods.goodsTitle},'%' )
+        </if>
+        <if test="infoGoods.onlineTimeBegin != null">
+            AND ab.online_time &gt;= #{infoGoods.onlineTimeBegin}
+        </if>
+        <if test="infoGoods.onlineTimeEnd != null">
+            AND ab.online_time &lt;= #{infoGoods.onlineTimeEnd}
+        </if>
+        <if test="infoGoods.source != null">
+            AND ab.source like CONCAT('%', #{infoGoods.source},'%' )
+        </if>
+        <if test="infoGoods.type != null">
+            AND ab.type = #{infoGoods.type}
+        </if>
+        <if test="infoGoods.state != null">
+            AND ab.state = #{infoGoods.state}
+        </if>
+        ORDER BY ab.update_time DESC
+    </select>
+
+    <!-- 只查询资讯 -->
+    <select id="selectInfoGoodsPage" resultMap="infoGoodsVOResultMap">
+        SELECT a.create_time,a.create_user,a.update_time,a.update_user,a.is_deleted,a.goods_id,a.goods_title,
+            a.sub_title,a.abstract,a.author,a.editor,a.is_original,a.source,
+             a.price,a.online_time,a.syn_time,a.state,a.dispose_suggest,a.dispose_time,a.dispose_user,a.invalid_time,
+             1 AS type
+          FROM pro_info_goods a  where is_deleted = 0
+          ORDER BY a.update_time DESC
+    </select>
+
+    <!-- 只查询研报 -->
+    <select id="selectReportGoodsPage" resultMap="infoGoodsVOResultMap">
+         SELECT b.create_time,b.create_user,b.update_time,b.update_user,b.is_deleted,b.goods_id,b.goods_title,
+                b.sub_title,b.abstract,b.author,b.editor,b.is_original,b.source,
+                 b.price,b.online_time,b.syn_time,b.state,b.dispose_suggest,b.dispose_time,b.dispose_user,b.invalid_time,
+                 2 AS type
+            FROM pro_report_goods b where is_deleted = 0
+            ORDER BY b.update_time DESC
+    </select>
+
+</mapper>

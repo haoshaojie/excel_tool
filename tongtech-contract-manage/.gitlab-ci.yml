@@ -1,0 +1,18 @@
+variables:
+  GIT_DEPTH: 0
+
+# 定义 stages（阶段），任务将按此顺序执行。
+stages:
+  - code_analysis
+
+#代码质量分析job
+sonarqube-job:
+  stage: code_analysis
+  image: maven:3.6.3-openjdk-11
+  script:
+    - mvn -s ./mvn-settings.xml -Dmaven.test.skip=true --batch-mode verify sonar:sonar -Dsonar.projectKey=$PROJECT_KEY -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.qualitygate.wait=true -X
+  allow_failure: true
+  only:
+    - merge_requests
+    - master
+    - dev

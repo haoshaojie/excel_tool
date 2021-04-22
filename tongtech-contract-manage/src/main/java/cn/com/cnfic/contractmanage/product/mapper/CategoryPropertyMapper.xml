@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.product.mapper.CategoryPropertyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="categoryPropertyResultMap" type="cn.com.cnfic.contractmanage.product.entity.CategoryProperty">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="cate_id" property="cateId"/>
+        <result column="prop_id" property="propId"/>
+    </resultMap>
+
+
+    <select id="selectCategoryPropertyPage" resultMap="categoryPropertyResultMap">
+        select id,cate_id,prop_id from pro_category_property where is_deleted = 0 ORDER BY update_time DESC
+    </select>
+    <!-- 查询产品类型和属性是否已经关联 -->
+    <select id="selectCategoryProperty" resultMap="categoryPropertyResultMap">
+        select id,cate_id,prop_id from pro_category_property where is_deleted = 0 and cate_id = #{cateId} and prop_id = #{propId} ORDER BY update_time DESC
+    </select>
+</mapper>

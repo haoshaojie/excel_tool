@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.customer.mapper.OrgCustMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="orgCustResultMap" type="cn.com.cnfic.contractmanage.customer.entity.OrgCust">
+        <result column="code" property="code"/>
+        <result column="parent_code" property="parentCode"/>
+        <result column="ancestors" property="ancestors"/>
+        <result column="name" property="name"/>
+        <result column="first_code" property="firstCode"/>
+        <result column="first_name" property="firstName"/>
+        <result column="second_code" property="secondCode"/>
+        <result column="second_name" property="secondName"/>
+        <result column="third_code" property="thirdCode"/>
+        <result column="third_name" property="thirdName"/>
+        <result column="cust_level" property="custLevel"/>
+    </resultMap>
+
+
+    <select id="selectOrgCustPage" resultMap="orgCustResultMap">
+        select * from sub_org_cust where is_deleted = 0
+    </select>
+    <resultMap id="treeNodeResultMap" type="org.springblade.core.tool.node.TreeNode">
+        <id column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="title" property="title"/>
+        <result column="value" property="value"/>
+        <result column="key" property="key"/>
+    </resultMap>
+
+    <select id="queryTree" resultMap="treeNodeResultMap">
+    select code as id, parent_code as parent_id, name as title, code as 'value', code as 'key' from sub_org_cust where is_deleted = 0
+    <if test="custLevel!=null">
+        and cust_level &lt;=#{custLevel}
+    </if>
+    </select>
+</mapper>

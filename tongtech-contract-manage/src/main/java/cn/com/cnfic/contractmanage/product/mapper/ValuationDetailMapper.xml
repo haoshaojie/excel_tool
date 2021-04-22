@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.product.mapper.ValuationDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="valuationDetailResultMap" type="cn.com.cnfic.contractmanage.product.entity.ValuationDetail">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="prod_id" property="prodId"/>
+        <result column="type" property="type"/>
+        <result column="valuation_id" property="valuationId"/>
+        <result column="prop_id" property="propId"/>
+        <result column="prop_code" property="propCode"/>
+        <result column="prop_name" property="propName"/>
+        <result column="prop_value" property="propValue"/>
+    </resultMap>
+
+
+    <select id="selectValuationDetailPage" resultMap="valuationDetailResultMap">
+        select * from pro_valuation_detail where is_deleted = 0
+    </select>
+
+    <delete id="removeByProdId">
+        DELETE FROM pro_valuation_detail WHERE type = #{type}
+        <foreach collection="ids" index="index" item="id"  open=" AND prod_id in (" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

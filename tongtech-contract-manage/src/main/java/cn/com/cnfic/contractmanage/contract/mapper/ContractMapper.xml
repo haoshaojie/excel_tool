@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cnfic.contractmanage.contract.mapper.ContractMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="contractResultMap" type="cn.com.cnfic.contractmanage.contract.vo.ContractVO">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user" property="createUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="con_source" property="conSource"/>
+        <result column="con_nc_id" property="conNcId"/>
+        <result column="con_nc_no" property="conNcNo"/>
+        <result column="con_no" property="conNo"/>
+        <result column="con_name" property="conName"/>
+        <result column="con_limit" property="conLimit"/>
+        <result column="cust_id" property="custId"/>
+        <result column="cust_contract_id" property="custContractId"/>
+        <result column="dept_id" property="deptId"/>
+        <result column="con_partb" property="conPartb"/>
+        <result column="con_type" property="conType"/>
+        <result column="con_state" property="conState"/>
+        <result column="sign_state" property="signState"/>
+        <result column="sign_type" property="signType"/>
+        <result column="renewal_state" property="renewalState"/>
+        <result column="sign_date" property="signDate"/>
+        <result column="con_start_time" property="conStartTime"/>
+        <result column="con_end_time" property="conEndTime"/>
+        <result column="con_amount" property="conAmount"/>
+        <result column="con_curr_amount" property="conCurrAmount"/>
+        <result column="con_demand" property="conDemand"/>
+        <result column="is_created" property="isCreated"/>
+        <result column="cust_code" property="custCode"/>
+        <result column="cust_name" property="custName"/>
+        <result column="cust_manager" property="custManager"/>
+        <result column="productCnt" property="productCnt"/>
+        <result column="userCnt" property="userCnt"/>
+    </resultMap>
+
+
+    <select id="selectContractPage" resultMap="contractResultMap">
+        select con.*,cus.cust_name,per.cust_manager from con_contract con
+        left join sub_org_customer cus on con.cust_id = cus.id
+        left join sub_org_contact per on con.cust_contract_id = per.id
+        where con.is_deleted = 0
+        <if test="depIds!=null and depIds.size()>0">
+            and con.dept_id in
+            <foreach item="item" index="index" collection="depIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="depIds == null or depIds.size()==0">
+            and 2=1
+        </if>
+        <if test="con.conName != null and con.conName != ''">
+            and con.con_name like concat('%',#{con.conName},'%')
+        </if>
+        <if test="con.conNo != null and con.conNo != ''">
+            and con.con_no like concat('%',#{con.conNo},'%')
+        </if>
+        <if test="con.custName != null and con.custName != ''">
+            and cus.cust_name like concat('%',#{con.custName},'%') and cus.is_deleted = 0
+        </if>
+        <if test="con.conState != null">
+            and con.con_state = #{con.conState}
+        </if>
+        <if test="con.conType != null">
+            and con.con_type = #{con.conType}
+        </if>
+        <if test="con.custManager != null and con.custManager != ''">
+            and per.cust_manager like concat('%',#{con.custManager},'%') and per.is_deleted = 0
+        </if>
+        <if test="con.startCreateTime != null and con.endCreateTime != null">
+            and con.create_time between #{con.startCreateTime} and #{con.endCreateTime}
+        </if>
+
+
+    </select>
+
+    <select id="selectByCustContactId" resultMap="contractResultMap">
+        select * from con_contract con
+        where con.is_deleted = 0 and con.cust_contract_id = #{custContactId}
+    </select>
+
+    <select id="selectByCustId" resultMap="contractResultMap">
+        select * from con_contract con
+        where con.is_deleted = 0 and con.cust_id = #{custId}
+    </select>
+
+    <!--查询合约关联用户及产品统计-->
+    <select id="getContractProUserInfo" resultMap="contractResultMap">
+        SELECT
+            contract.id,
+            contract.con_no,
+            COUNT(product.id) AS productCnt,
+            COUNT(userprod.user_id) AS userCnt
+        FROM
+            con_contract contract
+        LEFT JOIN
+            con_product product ON contract.id = product.con_id
+        LEFT JOIN
+            con_user_prod userprod ON contract.id = userprod.con_id
+        WHERE
+              contract.is_deleted = 0
+          AND contract.id in
+            <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        GROUP BY contract.id
+    </select>
+
+    <update id="updateContractAndNc">
+          UPDATE con_contract contract
+                    INNER JOIN
+                con_nc nc ON contract.con_nc_id = nc.id
+            SET
+                contract.con_nc_id = NULL,
+                nc.is_create = 0
+            WHERE
+                contract.id in
+            <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+    </update>
+
+    <select id="selectContractInfo"  resultMap="contractResultMap">
+      SELECT
+            contract.con_no,
+            contract.con_name,
+            contract.con_limit,
+            contract.con_type,
+            contract.con_state,
+            contract.dept_id,
+            orgcustomer.cust_code,
+            orgcustomer.cust_name,
+            contract.sign_state,
+            contract.sign_date,
+            contract.con_start_time,
+            contract.con_end_time,
+            contract.con_amount,
+            contract.con_curr_amount,
+            contract.con_demand,
+            contract.create_user,
+            contract.create_time,
+            contract.update_time,
+            contract.update_user
+        FROM
+            con_contract contract
+                LEFT JOIN
+            sub_org_customer orgCustomer ON contract.CUST_ID = orgCustomer.id
+                LEFT JOIN
+            sub_org_contact per on contract.cust_contract_id = per.id
+        WHERE
+            contract.is_deleted = 0
+        <if test="con.onlySelected.toString() != 'true'">
+            <if test="con.conName != null and con.conName != ''">
+                and contract.con_name like concat('%',#{con.conName},'%')
+            </if>
+            <if test="con.conNo != null and con.conNo != ''">
+                and contract.con_no like concat('%',#{con.conNo},'%')
+            </if>
+            <if test="con.custName != null and con.custName != ''">
+                and orgCustomer.cust_name like concat('%',#{con.custName},'%') and orgCustomer.is_deleted = 0
+            </if>
+            <if test="con.conState != null">
+                and contract.con_state = #{con.conState}
+            </if>
+            <if test="con.conType != null">
+                and contract.con_type = #{con.conType}
+            </if>
+            <if test="con.custManager != null and con.custManager != ''">
+                and per.cust_manager like concat('%',#{con.custManager},'%') and per.is_deleted = 0
+            </if>
+            <if test="con.startCreateTime != null and con.endCreateTime != null">
+                and contract.create_time between #{con.startCreateTime} and #{con.endCreateTime}
+            </if>
+        </if>
+        <if test="con.selectedRow != null and  con.selectedRow.size() > 0 and con.onlySelected.toString() = 'true'">
+            and contract.id in
+            <foreach collection="con.selectedRow" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        order by contract.id
+    </select>
+    
+    <select id="selectExcelContractUsers" resultType="cn.com.cnfic.contractmanage.contract.vo.ExcelConUserVO">
+        SELECT
+            contract.con_no as conNo ,
+            contract.con_name as conName,
+            ou.user_name as userName,
+            ou.user_email as userEmail,
+            ou.user_province as userProvince,
+            ou.user_city as userCity,
+            ou.user_phone as userPhone,
+            ou.cust_org as custOrg,
+            ou.cust_manager as custManager,
+            dict.dict_value as userType,
+            ou.user_tele as userTele,
+            ou.user_fax as userFax,
+            ou.user_desc as userDesc
+        FROM
+            con_contract contract
+                LEFT JOIN
+            con_user_prod up ON contract.id = up.con_id
+                AND up.is_deleted = 0
+                LEFT JOIN
+            sub_org_user ou ON up.user_id = ou.id AND ou.is_deleted = 0
+                LEFT JOIN
+            sys_dict dict ON ou.user_type = dict.dict_key
+                AND dict.is_deleted = 0
+                AND dict.code = 'user_type'
+        WHERE
+            contract.is_deleted = 0
+            and contract.id in
+            <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+                  #{item}
+            </foreach>
+            order by contract.id
+    </select>
+
+    <select id="selectExcelConContract" resultType="cn.com.cnfic.contractmanage.contract.vo.ExcelConContactVO">
+        SELECT
+            contract.con_no AS conNo,
+            contract.con_name AS conName,
+            oc.cust_manager AS custManager,
+            ocu.cust_name AS custName,
+            oc.contact_person AS contactPerson,
+            oc.contact_type AS contactType,
+            oc.contact_phone AS contactPhone,
+            oc.contact_email AS contactEmail,
+            oc.contact_dept AS contactDept,
+            oc.contact_job AS contactJob
+        FROM
+            con_contract contract
+                LEFT JOIN
+            sub_org_contact oc ON contract.cust_contract_id = oc.id
+                AND oc.is_deleted = 0
+                LEFT JOIN
+            sub_org_customer ocu ON ocu.id = oc.cust_org
+                AND ocu.is_deleted = 0
+        WHERE
+            contract.is_deleted = 0
+        and contract.id in
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        order by contract.id
+    </select>
+</mapper>
